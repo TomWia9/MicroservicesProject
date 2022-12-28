@@ -400,4 +400,7 @@ obj/
 /node_modules
 /wwwroot/node_modules
 
+#VSC
+.vscode/
+
 # End of https://www.toptal.com/developers/gitignore/api/dotnetcore,csharp
