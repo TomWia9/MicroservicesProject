@@ -8,7 +8,7 @@ public interface IRepository<T> where T : EntityBase
 
     IEnumerable<T> GetAll();
 
-    T GetById(int id);
+    T? GetById(int id);
 
     void Create(T entity);
 }

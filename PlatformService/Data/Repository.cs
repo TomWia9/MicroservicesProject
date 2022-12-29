@@ -16,7 +16,7 @@ public class Repository<T> : IRepository<T> where T : EntityBase
     {
         if(entity == null)
         {
-            throw new ArgumentNullException(nameof(T));
+            throw new ArgumentNullException(nameof(entity));
         }
 
         _context.Set<T>().Add(entity);
@@ -27,7 +27,7 @@ public class Repository<T> : IRepository<T> where T : EntityBase
         return _context.Set<T>().ToList();
     }
 
-    public T GetById(int id)
+    public T? GetById(int id)
     {
         return _context.Set<T>().Find(id);
     }
