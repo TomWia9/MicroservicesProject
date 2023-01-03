@@ -12,11 +12,18 @@ public class PlatformsController : ControllerBase
 {
     private readonly IRepository<Platform> _repository;
     private readonly IMapper _mapper;
+    private readonly ICommandDataClient _commandDataClient;
+    private readonly ILogger<PlatformsController> _logger;
 
-    public PlatformsController(IRepository<Platform> repository, IMapper mapper)
+    public PlatformsController(
+        IRepository<Platform> repository,
+        IMapper mapper,
+        ICommandDataClient commandDataClient, ILogger<PlatformsController> logger)
     {
         _repository = repository;
         _mapper = mapper;
+        _commandDataClient = commandDataClient;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -41,7 +48,7 @@ public class PlatformsController : ControllerBase
     }
     
     [HttpPost]
-    public ActionResult<PlatformDto> CreatePlatform([FromBody] CreatePlatformDto createPlatform)
+    public async Task<ActionResult<PlatformDto>> CreatePlatform([FromBody] CreatePlatformDto createPlatform)
     {
         var platformEntity = _mapper.Map<Platform>(createPlatform);
         
@@ -49,6 +56,15 @@ public class PlatformsController : ControllerBase
         _repository.SaveChanges();
 
         var platformDto = _mapper.Map<PlatformDto>(platformEntity);
+
+        try
+        {
+            await _commandDataClient.SendPlatformToCommand(platformDto);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Could not send synchronously: {EMessage}", e.Message);
+        }
         
         return CreatedAtAction("GetPlatform", new {id = platformDto.Id}, platformDto);
     }

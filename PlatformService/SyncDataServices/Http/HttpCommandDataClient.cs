@@ -8,10 +8,10 @@ namespace PlatformService.SyncDataServices.Http;
 public class HttpCommandDataClient : ICommandDataClient
 {
     private readonly HttpClient _httpClient;
-    private readonly ILogger _logger;
+    private readonly ILogger<HttpCommandDataClient> _logger;
     private readonly IConfiguration _configuration;
 
-    public HttpCommandDataClient(HttpClient httpClient, ILogger logger, IConfiguration configuration)
+    public HttpCommandDataClient(HttpClient httpClient, ILogger<HttpCommandDataClient> logger, IConfiguration configuration)
     {
         _httpClient = httpClient;
         _logger = logger;
