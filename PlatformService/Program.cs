@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PlatformService.Data;
 using PlatformService.Interfaces;
+using PlatformService.SyncDataServices.Http;
 using Serilog;
 using Serilog.Events;
 
@@ -27,6 +28,8 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
  opt.UseInMemoryDatabase("InMemory"));
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+builder.Services.AddHttpClient<ICommandDataClient, HttpCommandDataClient>();
 
 var app = builder.Build();
 
