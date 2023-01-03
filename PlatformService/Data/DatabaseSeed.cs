@@ -1,4 +1,5 @@
 using PlatformService.Entities;
+using Serilog;
 
 namespace PlatformService.Data;
 
@@ -14,7 +15,7 @@ public static class DatabaseSeed
     {
         if (context.Platforms.Any()) return;
         
-        Console.WriteLine("Seeding data...");
+        Log.Information("Seeding database");
 
         context.Platforms.AddRange(
             new Platform

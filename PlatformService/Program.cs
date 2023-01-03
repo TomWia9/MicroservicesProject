@@ -1,8 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using PlatformService.Data;
 using PlatformService.Interfaces;
+using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("System", LogEventLevel.Warning)
+    .WriteTo.Console()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add services to the container.
 
@@ -26,6 +37,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseSerilogRequestLogging();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
@@ -34,4 +47,17 @@ app.MapControllers();
 
 DatabaseSeed.PrepPopulation(app);
 
-app.Run();
+try
+{
+    Log.Information("Starting PlatformService");
+    app.Run();
+}
+catch (Exception e)
+{
+    Log.Fatal(e, "PlatformService terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
+
