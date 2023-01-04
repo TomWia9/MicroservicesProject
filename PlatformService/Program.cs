@@ -6,6 +6,8 @@ using Serilog;
 using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
+var environment = builder.Environment;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -24,8 +26,18 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<AppDbContext>(opt =>
- opt.UseInMemoryDatabase("InMemory"));
+if (environment.IsProduction())
+{
+    Log.Information("Using SQL SERVER database");
+    builder.Services.AddDbContext<AppDbContext>(opt =>
+        opt.UseSqlServer(configuration.GetConnectionString("PlatformServiceConnectionString")));
+}
+else
+{     
+    Log.Information("Using InMemory database");
+    builder.Services.AddDbContext<AppDbContext>(opt =>
+        opt.UseInMemoryDatabase("InMemory"));
+}
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
@@ -46,7 +58,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-DatabaseSeed.PrepPopulation(app);
+DatabaseSeed.PrepPopulation(app, environment.IsProduction());
 
 try
 {
