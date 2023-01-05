@@ -1,3 +1,6 @@
+using CommandsService.Data;
+using CommandsService.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 
@@ -14,10 +17,15 @@ builder.Host.UseSerilog();
 
 // Add services to the container.
 
+builder.Services
+    .AddDbContext<AppDbContext>(opt => opt.UseInMemoryDatabase("InMemory"));
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 var app = builder.Build();
 
