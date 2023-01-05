@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using CommandsService.Entities;
 using CommandsService.Interfaces;
 
@@ -22,9 +23,19 @@ public class Repository<T> : IRepository<T> where T : EntityBase
         _context.Set<T>().Add(entity);
     }
 
+    public bool Exists(int id)
+    {
+        return _context.Set<T>().Any();
+    }
+
     public IEnumerable<T> GetAll()
     {
         return _context.Set<T>().ToList();
+    }
+
+    public IEnumerable<T> GetAll(Expression<Func<T, bool>> predicate)
+    {
+        return _context.Set<T>().Where(predicate).ToList();
     }
 
     public T? GetById(int id)
