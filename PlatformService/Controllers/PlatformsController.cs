@@ -14,16 +14,20 @@ public class PlatformsController : ControllerBase
     private readonly IMapper _mapper;
     private readonly ICommandDataClient _commandDataClient;
     private readonly ILogger<PlatformsController> _logger;
+    private readonly IMessageBusClient<PublishedPlatformDto> _messageBusClient;
 
     public PlatformsController(
         IRepository<Platform> repository,
         IMapper mapper,
-        ICommandDataClient commandDataClient, ILogger<PlatformsController> logger)
+        ICommandDataClient commandDataClient,
+        ILogger<PlatformsController> logger,
+        IMessageBusClient<PublishedPlatformDto> messageBusClient)
     {
         _repository = repository;
         _mapper = mapper;
         _commandDataClient = commandDataClient;
         _logger = logger;
+        _messageBusClient = messageBusClient;
     }
 
     [HttpGet]
@@ -57,6 +61,7 @@ public class PlatformsController : ControllerBase
 
         var platformDto = _mapper.Map<PlatformDto>(platformEntity);
 
+        //Send sync message
         try
         {
             await _commandDataClient.SendPlatformToCommand(platformDto);
@@ -64,6 +69,18 @@ public class PlatformsController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError("Could not send synchronously: {EMessage}", e.Message);
+        }
+        
+        //Send async message
+        try
+        {
+            var publishedPlatformDto = _mapper.Map<PublishedPlatformDto>(platformDto);
+            publishedPlatformDto.Event = "Platform_Published";
+            _messageBusClient.Publish(publishedPlatformDto);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Could not send asynchronously: {EMessage}", e.Message);
         }
         
         return CreatedAtAction("GetPlatform", new {id = platformDto.Id}, platformDto);
