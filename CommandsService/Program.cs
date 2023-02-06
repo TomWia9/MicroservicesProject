@@ -1,3 +1,4 @@
+using CommandsService.AsyncDataServices;
 using CommandsService.Data;
 using CommandsService.EventProcessing;
 using CommandsService.Interfaces;
@@ -28,6 +29,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
+builder.Services.AddHostedService<MessageBusSubscriber>();
 
 var app = builder.Build();
 
