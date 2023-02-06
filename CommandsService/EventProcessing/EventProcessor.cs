@@ -58,10 +58,11 @@ public class EventProcessor : IEventProcessor
         {
             var platform = _mapper.Map<Platform>(publishedPlatformDto);
 
-            if (platformsRepository.Exists(x => x.ExternalId == platform.ExternalId))
+            if (!platformsRepository.Exists(x => x.ExternalId == platform.ExternalId))
             {
                 platformsRepository.Create(platform);
                 platformsRepository.SaveChanges();
+                _logger.LogInformation("Platform added");
             }
             else
             {
