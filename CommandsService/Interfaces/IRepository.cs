@@ -16,4 +16,6 @@ public interface IRepository<T> where T : EntityBase
     void Create(T entity);
 
     bool Exists(int id);
+    
+    bool Exists(Expression<Func<T, bool>> predicate);
 }

@@ -25,7 +25,12 @@ public class Repository<T> : IRepository<T> where T : EntityBase
 
     public bool Exists(int id)
     {
-        return _context.Set<T>().Any();
+        return _context.Set<T>().Any(x => x.Id == id);
+    }
+    
+    public bool Exists(Expression<Func<T, bool>> predicate)
+    {
+        return _context.Set<T>().Any(predicate);
     }
 
     public IEnumerable<T> GetAll()
