@@ -63,6 +63,8 @@ public class CommandsController : ControllerBase
             return NotFound();
         }
 
+        command.PlatformId = platformId;
+
         var commandEntity = _mapper.Map<Command>(command);
         
         _commandsRepository.Create(commandEntity);
