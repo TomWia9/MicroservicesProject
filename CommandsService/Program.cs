@@ -48,6 +48,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+PrepDb.PrepPopulation(app);
+
 try
 {
     Log.Information("Starting CommandsService");
